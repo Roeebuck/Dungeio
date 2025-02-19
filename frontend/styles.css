@@ -1,0 +1,88 @@
+/* 🌑 Obecné styly */
+body {
+    font-family: Arial, sans-serif;
+    background: #111;
+    color: #eee;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
+
+/* 📌 Kontejner pro hru */
+#game {
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+}
+
+/* ✏️ Styl pro inputy a textarea */
+input, textarea, select {
+    width: 90%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #444;
+    background: #222;
+    color: #eee;
+    border-radius: 5px;
+}
+
+/* 🖲️ Styl pro tlačítka */
+button {
+    padding: 12px 20px;
+    background: #007bff;
+    border: none;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #0056b3;
+}
+
+/* 🦸‍♂️ Výběr postavy */
+.character-list {
+    text-align: left;
+    display: inline-block;
+    background: #222;
+    padding: 15px;
+    border-radius: 8px;
+    list-style: none;
+}
+
+.character-list li {
+    margin: 10px 0;
+}
+
+.character-list button {
+    background: #28a745;
+    width: 100%;
+}
+
+.character-list button:hover {
+    background: #1e7e34;
+}
+
+/* 📖 Sekce příběhu */
+#storySection {
+    margin-top: 20px;
+    padding: 15px;
+    background: #222;
+    border-radius: 8px;
+}
+
+#story {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* 📱 Responsivita */
+@media (max-width: 600px) {
+    input, textarea, select {
+        width: 100%;
+    }
+    button {
+        width: 100%;
+    }
+}

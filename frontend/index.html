@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dungeio - Nekonečný Příběh</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #111; color: #eee; text-align: center; }
+        #game { max-width: 800px; margin: auto; padding: 20px; }
+        input, select, button { width: 90%; padding: 10px; margin: 10px 0; }
+        .character-list { text-align: left; display: inline-block; }
+    </style>
+</head>
+<body>
+    <div id="game">
+        <h1>🌀 Dungeio - Nekonečný Příběh</h1>
+        
+        <!-- 1️⃣ Počet hráčů -->
+        <div id="playerCountSelection">
+            <p>Kolik hráčů bude hrát?</p>
+            <select id="playerCount">
+                <option value="2">2 hráči</option>
+                <option value="3">3 hráči</option>
+                <option value="4">4 hráči</option>
+            </select>
+            <button onclick="selectPlayerCount()">Pokračovat</button>
+        </div>
+
+        <!-- 2️⃣ Vypravěč -->
+        <div id="storytellerSelection" style="display: none;">
+            <p>Jaký bude váš vypravěč?</p>
+            <input type="text" id="storytellerInput" placeholder="Napište svého vypravěče....">
+            <button onclick="startGame()">Začít hru</button>
+        </div>
+
+        <!-- 3️⃣ Výběr postav -->
+        <div id="characterSelection" style="display: none;"></div>
+
+        <!-- 4️⃣ Herní sekce -->
+        <div id="storySection" style="display: none;">
+            <p id="story"></p>
+            <textarea id="playerInput" placeholder="Napište svou odpověď..."></textarea>
+            <button onclick="nextScene()">Pokračovat</button>
+        </div>
+    </div>
+
+    <script>
+        let storyteller = "";
+        let playerCount = 2;
+        let selectedCharacters = {};
+        let currentPlayer = 1;
+
+        function selectPlayerCount() {
+            playerCount = document.getElementById("playerCount").value;
+            document.getElementById("playerCountSelection").style.display = "none";
+            document.getElementById("storytellerSelection").style.display = "block";
+        }
+
+        async function startGame() {
+            storyteller = document.getElementById("storytellerInput").value;
+            if (!storyteller) {
+                alert("Prosím, napište vypravěče!");
+                return;
+            }
+
+            const response = await fetch("http://127.0.0.1:5001/start", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ narrator: storyteller, players_count: playerCount })
+            });
+            
+            const data = await response.json();
+            displayCharacterSelection(data.characters);
+        }
+
+        function displayCharacterSelection(characters) {
+            const charDiv = document.getElementById("characterSelection");
+            charDiv.innerHTML = `<h2>Hráč ${currentPlayer}, vyberte si postavu:</h2>`;
+            charDiv.innerHTML += '<ul class="character-list">' + characters.map((char, index) => `
+                <li><button onclick="selectCharacter(${currentPlayer}, '${char}')">${index + 1}. ${char}</button></li>
+            `).join('') + '</ul>';
+            charDiv.style.display = "block";
+        }
+
+        function selectCharacter(player, character) {
+            selectedCharacters[player] = character;
+            if (Object.keys(selectedCharacters).length < playerCount) {
+                currentPlayer++;
+                displayCharacterSelection(selectedCharacters);
+            } else {
+                document.getElementById("characterSelection").style.display = "none";
+                document.getElementById("storySection").style.display = "block";
+                nextScene();
+            }
+        }
+
+        async function nextScene() {
+            const playerInput = document.getElementById("playerInput").value;
+            document.getElementById("playerInput").value = "";
+
+            const response = await fetch("http://127.0.0.1:5001/next_event", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ responses: selectedCharacters })
+            });
+            
+            const data = await response.json();
+            document.getElementById("story").innerText = data.story;
+        }
+    </script>
+</body>
+</html>
