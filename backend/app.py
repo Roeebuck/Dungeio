@@ -14,7 +14,7 @@ if not OPENROUTER_API_KEY:
     raise ValueError("❌ CHYBA: API klíč nebyl načten! Zkontroluj .env soubor.")
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "https://www.dunge.io"}})  # Povolení CORS jen pro frontend
 
 game = None  # Herní instance bude inicializována ve start_game
 
@@ -33,17 +33,16 @@ def start_game():
         return jsonify({"error": "❌ Chybějící data!"}), 400
     
     players_count = data.get("players_count")
-    narrator = data.get("narrator", "").strip()
+    storyteller = data.get("storyteller", "").strip()
 
     if not isinstance(players_count, int) or not (1 <= players_count <= 6):
         return jsonify({"error": "❌ Počet hráčů musí být číslo mezi 1 a 6!"}), 400
     
-    if not narrator:
+    if not storyteller:
         return jsonify({"error": "❌ Vypravěč nesmí být prázdný!"}), 400
     
-    game = Game(players_count, narrator)
+    game = Game(players_count, storyteller)
     response = game.start_game()
-
     return jsonify(response)
 
 @app.route('/choose_character', methods=['POST'])
